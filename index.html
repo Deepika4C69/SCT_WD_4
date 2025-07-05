@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO-DO PRO - Advanced To-Do App</title>
+    <meta name="description" content="A feature-rich to-do application with advanced task management capabilities">
+    <meta name="keywords" content="todo, task manager, productivity, PWA, offline app">
+    <meta name="theme-color" content="#4285f4">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Particle Background -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <header>
+            <button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+            <h1>TO-DO PRO</h1>
+            <p class="subtitle">Your advanced task management solution</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-tasks">0</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="completed-tasks">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="pending-tasks">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="overdue-tasks">0</div>
+                    <div class="stat-label">Overdue</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Search tasks...">
+            </div>
+            
+            <div class="filter-container">
+                <button class="filter-btn active" data-filter="all">All Tasks</button>
+                <button class="filter-btn" data-filter="active">Active</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+                <button class="filter-btn" data-filter="high">High Priority</button>
+                <button class="filter-btn" data-filter="today">Due Today</button>
+                <button class="filter-btn" data-filter="week">Due This Week</button>
+                <button class="filter-btn" data-filter="overdue">Overdue</button>
+            </div>
+            
+            <div class="input-container">
+                <div class="form-group">
+                    <label for="task-input">Task Title</label>
+                    <input type="text" id="task-input" placeholder="What needs to be done?">
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Priority</label>
+                    <select id="task-priority">
+                        <option value="low">Low Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="high">High Priority</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-date">Due Date</label>
+                    <input type="date" id="task-date">
+                </div>
+                <div class="form-group">
+                    <label for="task-category">Category</label>
+                    <select id="task-category">
+                        <option value="">No Category</option>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="health">Health</option>
+                        <option value="education">Education</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <button id="add-btn" class="btn btn-pink">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="task-notes">Notes (Optional)</label>
+                <textarea id="task-notes" placeholder="Add additional details about this task..."></textarea>
+            </div>
+            
+            <ul class="task-list" id="task-list">
+                <!-- Tasks will be added here dynamically -->
+            </ul>
+            
+            <div class="empty-state" id="empty-state">
+                <i class="fas fa-tasks"></i>
+                <h3>No tasks found</h3>
+                <p>Add a new task to get started or try changing your filters</p>
+                <button class="btn btn-yellow" id="add-sample-tasks">
+                    <i class="fas fa-magic"></i> Add Sample Tasks
+                </button>
+                <button class="btn btn-green" id="import-tasks-btn" style="margin-top: 10px;">
+                    <i class="fas fa-file-import"></i> Import Tasks
+                </button>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn btn-outline" id="export-tasks-btn">
+                    <i class="fas fa-file-export"></i> Export Tasks
+                </button>
+                <button class="btn btn-outline" id="print-tasks-btn" style="margin-left: 10px;">
+                    <i class="fas fa-print"></i> Print Tasks
+                </button>
+                <button class="btn btn-danger" id="clear-tasks-btn" style="margin-left: 10px;">
+                    <i class="fas fa-trash"></i> Clear All Tasks
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Task Modal -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Task</h3>
+                <button class="close-btn" id="close-edit-modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="form-control">
+                <label for="edit-task-title">Task Title</label>
+                <input type="text" id="edit-task-title">
+            </div>
+            <div class="form-control">
+                <label for="edit-task-priority">Priority</label>
+                <select id="edit-task-priority">
+                    <option value="low">Low Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="high">High Priority</option>
+                </select>
+            </div>
+            <div class="form-control">
+                <label for="edit-task-date">Due Date</label>
+                <input type="date" id="edit-task-date">
+            </div>
+            <div class="form-control">
+                <label for="edit-task-category">Category</label>
+                <select id="edit-task-category">
+                    <option value="">No Category</option>
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="health">Health</option>
+                    <option value="education">Education</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-control">
+                <label for="edit-task-notes">Notes</label>
+                <textarea id="edit-task-notes" rows="4"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="delete-task-btn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <button class="btn btn-pink" id="save-task-btn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import Modal -->
+    <div class="modal" id="import-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Import Tasks</h3>
+                <button class="close-btn" id="close-import-modal">&times;</button>
+            </div>
+            <div class="form-control">
+                <label for="import-format">Import Format</label>
+                <select id="import-format">
+                    <option value="json">JSON</option>
+                    <option value="csv">CSV</option>
+                </select>
+            </div>
+            <div class="form-control">
+                <label for="import-file">Select File</label>
+                <input type="file" id="import-file" accept=".json,.csv">
+            </div>
+            <div class="form-control">
+                <label>
+                    <input type="checkbox" id="import-overwrite"> Overwrite existing tasks
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-import-btn">
+                    Cancel
+                </button>
+                <button class="btn btn-pink" id="confirm-import-btn">
+                    <i class="fas fa-file-import"></i> Import
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Export Modal -->
+    <div class="modal" id="export-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Export Tasks</h3>
+                <button class="close-btn" id="close-export-modal">&times;</button>
+            </div>
+            <div class="form-control">
+                <label for="export-format">Export Format</label>
+                <select id="export-format">
+                    <option value="json">JSON</option>
+                    <option value="csv">CSV</option>
+                </select>
+            </div>
+            <div class="form-control">
+                <label for="export-filter">Filter to Export</label>
+                <select id="export-filter">
+                    <option value="all">All Tasks</option>
+                    <option value="active">Active Tasks</option>
+                    <option value="completed">Completed Tasks</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-export-btn">
+                    Cancel
+                </button>
+                <button class="btn btn-pink" id="confirm-export-btn">
+                    <i class="fas fa-file-export"></i> Export
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">Task added successfully!</span>
+    </div>
+    
+    <!-- Install Prompt -->
+    <div class="modal" id="install-prompt">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Install TO-DO PRO</h3>
+                <button class="close-btn" id="close-install-prompt">&times;</button>
+            </div>
+            <p style="margin-bottom: 20px;">Would you like to install this app on your device for easy access?</p>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-install-btn">
+                    Not Now
+                </button>
+                <button class="btn btn-pink" id="confirm-install-btn">
+                    <i class="fas fa-download"></i> Install
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
